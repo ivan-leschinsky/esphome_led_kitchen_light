@@ -1,0 +1,71 @@
+esphome:
+  name: led_kitchen_light
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+
+# Enable logging
+logger:
+  # level: ERROR
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  password: !secret api_ota_pass
+
+ota:
+  password: !secret api_ota_pass
+
+mqtt:
+  broker: !secret mqtt_broker
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  discovery: True
+
+web_server:
+  port: 80
+
+output:
+  - platform: esp8266_pwm
+    pin: GPIO05
+    id: gpio_out_1
+  # - platform: esp8266_pwm
+  #   pin: GPIO14
+  #   id: gpio_out_2
+  # - platform: esp8266_pwm
+  #   pin: GPIO12
+  #   id: gpio_out_3
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 0
+      mode: INPUT_PULLUP
+    name: "Kitchen light button"
+    device_class: light
+    on_state:
+      then:
+        - light.toggle:
+            id: kitchen_led_1
+            transition_length: '1s'
+
+# Example configuration entry
+light:
+  - platform: monochromatic
+    name: "Kitchen LED Lights 1"
+    output: gpio_out_1
+    id: kitchen_led_1
+  # - platform: monochromatic
+  #   name: "Kitchen LED Lights 2"
+  #   output: gpio_out_2
+  #   id: kitchen_led_2
+  # - platform: monochromatic
+  #   name: "Kitchen LED Lights 3"
+  #   output: gpio_out_3
+  #   id: kitchen_led_3
+
