@@ -50,9 +50,20 @@ binary_sensor:
     device_class: light
     on_state:
       then:
-        - light.toggle:
-            id: kitchen_led_1
-            transition_length: '1s'
+        - if:
+            condition:
+              light.is_on: kitchen_led_1
+            then:
+              - light.turn_off:
+                  id: kitchen_led_1
+                  transition_length: '2s'
+        - if:
+            condition:
+              light.is_off: kitchen_led_1
+            then:
+              - light.turn_on:
+                  id: kitchen_led_1
+                  brightness: 100%
 
 # Example configuration entry
 light:
