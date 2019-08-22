@@ -8,6 +8,7 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   fast_connect: true
+  reboot_timeout: 20min
 
 # Enable logging
 logger:
