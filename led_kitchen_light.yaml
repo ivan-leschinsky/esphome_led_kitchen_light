@@ -1,8 +1,8 @@
 esphome:
   name: led_kitchen_light
   platform: ESP8266
-  board: esp01_1m
-  board_flash_mode: dout
+  board: esp8285
+  # board_flash_mode: dout
 
 wifi:
   ssid: !secret wifi_ssid
@@ -12,21 +12,29 @@ wifi:
 
 # Enable logging
 logger:
+  # level: NONE
   # level: ERROR
-  level: DEBUG
+  # level: WARN
+  level: INFO
+  # level: DEBUG
+  # level: VERBOSE
+  # level: VERY_VERBOSE
+
 
 # Enable Home Assistant API
 api:
   password: !secret api_ota_pass
+  reboot_timeout: 20min
 
 ota:
   password: !secret api_ota_pass
+  # safe_mode: false
 
-mqtt:
-  broker: !secret mqtt_broker
-  username: !secret mqtt_user
-  password: !secret mqtt_password
-  discovery: True
+# mqtt:
+#   broker: !secret mqtt_broker
+#   username: !secret mqtt_user
+#   password: !secret mqtt_password
+#   discovery: clean
 
 web_server:
   port: 80
