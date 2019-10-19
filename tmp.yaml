@@ -15,7 +15,6 @@ wifi:
 
 # Enable logging
 logger:
-  # level: DEBUG
   level: ERROR
 
 # Enable Home Assistant API
@@ -29,13 +28,11 @@ ota:
 web_server:
   port: 80
 
-time:
-  - platform: homeassistant
-    id: homeassistant_time
-    timezone: '+03'
-  - platform: sntp
-    id: sntp_time
-    timezone: '+03'
+globals:
+  - id: button_state
+    type: int
+    restore_value: no
+    initial_value: '0'
 
 output:
   - platform: esp8266_pwm
@@ -69,33 +66,31 @@ binary_sensor:
     device_class: light
     on_state:
       then:
+        - lambda: |-
+            if (id(button_state) > 2) {
+              // global value is greater than 5
+              id(button_state) = 0;
+            } else {
+              id(button_state) += 10;
+            }
+      then:
         - if:
             condition:
-              light.is_on: kitchen_led_1
+              and:
+                - light.is_on: kitchen_led_1
+                - lambda: |-
+                    return id(button_state).state >= 2;
             then:
               - light.turn_off:
                   id: kitchen_led_1
                   transition_length: '2s'
         - if:
             condition:
-              and:
-                - light.is_off: kitchen_led_1
-                - lambda: return id(sntp_time).utcnow().hour >= 3 && id(sntp_time).utcnow().hour < 20;
-                # - lambda: return id(homeassistant_time).now().hour >= 6 && id(homeassistant_time).now().hour < 23;
+              light.is_off: kitchen_led_1
             then:
               - light.turn_on:
                   id: kitchen_led_1
                   brightness: 100%
-        - if:
-            condition:
-              and:
-                - light.is_off: kitchen_led_1
-                - lambda: return id(sntp_time).utcnow().hour >= 20 || id(sntp_time).utcnow().hour < 3;
-                # - lambda: return id(homeassistant_time).now().hour >= 23 || id(homeassistant_time).now().hour < 6;
-            then:
-              - light.turn_on:
-                  id: kitchen_led_1
-                  brightness: 30%
 
 light:
   - platform: monochromatic
