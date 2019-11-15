@@ -1,0 +1,28 @@
+name: corridor_motion compile
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.6]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install esphome
+    - name: Copy secrets config
+      run: cp secrets.yaml.sample secrets.yaml
+    - name: Compile EspHome with platformio
+      run: |
+        esphome corridor_motion.yaml compile
